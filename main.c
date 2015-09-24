@@ -57,8 +57,8 @@ void switch_to_ctx (struct ctx_s* ctx){
 struct ctx_s ctx_ping;
 struct ctx_s ctx_pong;
 
-void f_pong(void* arg);
-void f_ping(void* arg);
+void f_pong(void*);
+void f_ping(void*);
 
 
 int main (void){
@@ -81,7 +81,7 @@ void f_ping(void* args){
 	}
 }
 
-void f_ping(void* args){
+void f_pong(void* args){
 	while(1){
 		printf("1");
 		switch_to_ctx(&ctx_ping);

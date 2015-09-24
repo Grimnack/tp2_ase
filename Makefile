@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS= -W -Wall -pedantic -m32 -g
+CFLAGS= -W -Wall -m32 -g
 EXEC= main
 
 all: $(EXEC)
