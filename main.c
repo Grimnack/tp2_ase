@@ -6,7 +6,6 @@ typedef void (func_t) (void *) ;
 enum ctx_state_e { INITIALIZED, ACTIVABLE, TERMINATED} ;
 
 struct ctx_s {
-   unsigned char *ctx_stack;
 	void* ctx_ebp ;
 	void* ctx_esp ;
 	int magic ;
@@ -16,11 +15,14 @@ struct ctx_s {
 } ;
 
 int init_ctx (struct ctx_s* ctx, int stack_size, func_t f, void* args){
-   ctx->ctx_stack = (unsigned char*) malloc (stack_size);
-	ctx->ctx_ebp = ctx->ctx_stack[stack_size - sizeof(void *)];
-	ctx->ctx_esp = ctx->ctx_stack[stack_size - sizeof(void *)];
+   unsigned char* bas ;
+   void* top ;
+   bas = malloc(stack_size) ;
+   top = bas + stack_size - sizeof(void*) ;
+   ctx->ctx_ebp = top;
+   ctx->ctx_esp = top;
 	ctx->magic = 0xB00B5666 ;
-	ctx->f = &f;
+	ctx->f = f;
 	ctx->ctx_arg = args ;
 	ctx-> ctx_state = INITIALIZED;
 	return 0;
@@ -38,9 +40,8 @@ void switch_to_ctx (struct ctx_s* ctx){
 		asm("movl %%ebp, %0 \n\t movl %%esp, %1"
 			:"=r" (ctx_courant->ctx_ebp),
 			"=r" (ctx_courant->ctx_esp));
-	}else{
-		ctx_courant = ctx;
 	}
+	ctx_courant = ctx;
 	/*Deuxieme etape, on change de contexte*/
 	asm("movl %0, %%ebp \n\t movl %1, %%esp"
 		::"r" (ctx->ctx_ebp),
