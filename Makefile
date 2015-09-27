@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS= -W -Wall -m32 -g
-EXEC= main
+EXEC=main
 
 all: $(EXEC)
 

@@ -6,6 +6,7 @@ typedef void (func_t) (void *) ;
 enum ctx_state_e { INITIALIZED, ACTIVABLE, TERMINATED} ;
 
 struct ctx_s {
+   unsigned char *ctx_stack;
 	void* ctx_ebp ;
 	void* ctx_esp ;
 	int magic ;
@@ -15,12 +16,9 @@ struct ctx_s {
 } ;
 
 int init_ctx (struct ctx_s* ctx, int stack_size, func_t f, void* args){
-	char* bas ;
-	void* top ;
-	bas = malloc(stack_size) ;
-	top = bas + stack_size - sizeof(void*) ;
-	ctx->ctx_ebp = top;
-	ctx->ctx_esp = top;
+   ctx->ctx_stack = (unsigned char*) malloc (stack_size);
+	ctx->ctx_ebp = ctx->ctx_stack[stack_size - sizeof(void *)];
+	ctx->ctx_esp = ctx->ctx_stack[stack_size - sizeof(void *)];
 	ctx->magic = 0xB00B5666 ;
 	ctx->f = f;
 	ctx->ctx_arg = args ;
@@ -34,20 +32,22 @@ struct ctx_s *ctx_courant =NULL ;
 
 */
 void switch_to_ctx (struct ctx_s* ctx){
-	/*Premiere etape, sort-on d'un contexte si oui on sauvegarde le contexte qu'on a quitté*/
+	/*Premiere etape, sort-on d'un contexte 
+   si oui on sauvegarde le contexte qu'on a quitté*/
 	if(ctx_courant!=NULL){
-		asm("mov %%ebp, %0 \n\t mov %%esp, %1"
+		asm("movl %%ebp, %0 \n\t movl %%esp, %1"
 			:"=r" (ctx_courant->ctx_ebp),
 			"=r" (ctx_courant->ctx_esp));
 	}else{
 		ctx_courant = ctx;
 	}
 	/*Deuxieme etape, on change de contexte*/
-	asm("mov %0, %%ebp \n\t mov %1, %%esp"
+	asm("movl %0, %%ebp \n\t movl %1, %%esp"
 		::"r" (ctx->ctx_ebp),
 		"r" (ctx->ctx_esp));
 	if(ctx_courant->ctx_state==INITIALIZED){
-		(ctx_courant->f) (ctx_courant->ctx_arg);
+      ctx_courant->ctx_state=ACTIVABLE;
+      (ctx_courant->f) (ctx_courant->ctx_arg);
 		return ;
 	};
 	return ;
