@@ -20,7 +20,7 @@ int init_ctx (struct ctx_s* ctx, int stack_size, func_t f, void* args){
 	ctx->ctx_ebp = ctx->ctx_stack[stack_size - sizeof(void *)];
 	ctx->ctx_esp = ctx->ctx_stack[stack_size - sizeof(void *)];
 	ctx->magic = 0xB00B5666 ;
-	ctx->f = f;
+	ctx->f = &f;
 	ctx->ctx_arg = args ;
 	ctx-> ctx_state = INITIALIZED;
 	return 0;
@@ -47,7 +47,7 @@ void switch_to_ctx (struct ctx_s* ctx){
 		"r" (ctx->ctx_esp));
 	if(ctx_courant->ctx_state==INITIALIZED){
       ctx_courant->ctx_state=ACTIVABLE;
-      (ctx_courant->f) (ctx_courant->ctx_arg);
+      (*(ctx_courant->f))(ctx_courant->ctx_arg);
 		return ;
 	};
 	return ;
