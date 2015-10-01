@@ -3,6 +3,7 @@
 
 typedef void (func_t) (void *) ;
 
+/*type enum nous permettant de connaitre l'etat d'un contexte, dans le tp2 le */
 enum ctx_state_e { INITIALIZED, ACTIVABLE, TERMINATED} ;
 
 struct ctx_s {
@@ -70,7 +71,7 @@ int main (void){
 	exit(EXIT_SUCCESS);
 }
 
-
+/*fonction qui va changer de context vers le contexte de pong après avoir imprimé un char*/
 void f_ping(void* args){
 	while(1){
 		printf("A");
@@ -82,6 +83,7 @@ void f_ping(void* args){
 	}
 }
 
+/*fonction qui va changer de context vers le contexte de ping après avoir imprimé un char*/
 void f_pong(void* args){
 	while(1){
 		printf("1");
